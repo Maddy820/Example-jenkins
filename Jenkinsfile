@@ -18,9 +18,9 @@ pipeline {
                     // Run SonarQube Scanner with sonar.projectKey
                     withSonarQubeEnv() {
                         sh """
-                            ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=4fb111d682327ac0f2e5e09d4f78e8890549c3dc \  // Replace with your actual project key
-                            -Dsonar.projectName=TestProject-Jenkins \
+                            ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner 
+                            -Dsonar.projectKey=4fb111d682327ac0f2e5e09d4f78e8890549c3dc 
+                            -Dsonar.projectName=TestProject-Jenkins 
                             -Dsonar.sources=.
                         """
                     }
