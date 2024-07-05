@@ -19,7 +19,7 @@ pipeline {
                     withSonarQubeEnv() {
                         sh """
                             ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner 
-                            -Dsonar.projectKey=4fb111d682327ac0f2e5e09d4f78e8890549c3dc 
+                            -Dsonar.projectKey=sonar.projectKey=test-project-jenkins-key3 
                             -Dsonar.projectName=test-project-jenkins 
                             -Dsonar.sources=.
                         """
