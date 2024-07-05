@@ -1,45 +1,40 @@
 pipeline {
-    agent any
-
+    agent { label "dev-server"}
+    
     stages {
-        stage('SCM') {
-            steps {
-                checkout scm
+        
+        stage("code"){
+            steps{
+                git url: "https://github.com/LondheShubham153/node-todo-cicd.git", branch: "master"
+                echo 'bhaiyya code clone ho gaya'
             }
         }
-
-        stage('SonarQube Analysis') {
-            environment {
-                // Define SonarQube scanner tool
-                SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
+        stage("build and test"){
+            steps{
+                sh "docker build -t node-app-test-new ."
+                echo 'code build bhi ho gaya'
             }
-            steps {
-                script {
-                    // Run SonarQube Scanner with sonar.projectKey
-                    withSonarQubeEnv() {
-                        sh """
-                            ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner 
-                            -Dsonar.projectKey=sonar.projectKey=test-project-jenkins-key3 
-                            -Dsonar.projectName=test-project-jenkins 
-                            -Dsonar.sources=.
-                        """
-                    }
+        }
+        stage("scan image"){
+            steps{
+                echo 'image scanning ho gayi'
+            }
+        }
+        stage("push"){
+            steps{
+                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
+                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                sh "docker tag node-app-test-new:latest ${env.dockerHubUser}/node-app-test-new:latest"
+                sh "docker push ${env.dockerHubUser}/node-app-test-new:latest"
+                echo 'image push ho gaya'
                 }
             }
         }
-
-        stage('Quality Gate') {
-            steps {
-                script {
-                    // Wait for SonarQube analysis and check Quality Gate status
-                    def qg = waitForQualityGate()
-                    if (qg.status != 'OK') {
-                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                    }
-                }
+        stage("deploy"){
+            steps{
+                sh "docker-compose down && docker-compose up -d"
+                echo 'deployment ho gayi'
             }
         }
-
-        // Add more stages as needed for your pipeline
     }
 }
